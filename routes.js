@@ -9,7 +9,7 @@
 const { sampleHandler } = require("./handlers/routeHandlers/sampleHandlers");
 
 const routes = {
-  t: sampleHandler,
+  sample: sampleHandler,
 };
 
 module.exports = routes;

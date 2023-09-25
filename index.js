@@ -13,11 +13,6 @@ const { handleReqRes } = require("./helpers/handleReqRes");
 //---app object - module scaffolding------
 const app = {};
 
-//---configuration----------------------------------------------------
-app.config = {
-  port: 3000,
-};
-
 //----Create server----------------
 
 app.createServer = () => {
