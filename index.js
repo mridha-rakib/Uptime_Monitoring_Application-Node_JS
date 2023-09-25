@@ -7,8 +7,7 @@
 
 //---Dependencies----------------------------------------------------
 const http = require("http");
-const url = require("url");
-const { StringDecoder } = require("string_decoder");
+
 const { handleReqRes } = require("./helpers/handleReqRes");
 
 //---app object - module scaffolding------
@@ -22,7 +21,7 @@ app.config = {
 //----Create server----------------
 
 app.createServer = () => {
-  const server = http.createServer(app.handleRequest);
+  const server = http.createServer(app.handleReqRes);
   server.listen(app.config.port, () => {
     console.log("server listening on port " + app.config.port);
   });
@@ -32,4 +31,4 @@ app.createServer = () => {
 app.handleReqRes = handleReqRes;
 
 //----handle request response--------------------------------
-app.app.createServer();
+app.createServer();
