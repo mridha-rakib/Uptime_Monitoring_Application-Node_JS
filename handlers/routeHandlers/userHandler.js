@@ -6,13 +6,15 @@
  */
 // dependencies
 const data = require("../../lib/data");
+const { hash } = require("../../helpers/utilities");
+const { parseJSON } = require("../../helpers/utilities");
 
-// === module scaffolding======
+// module scaffolding
 const handler = {};
 
 handler.userHandler = (requestProperties, callback) => {
   const acceptedMethods = ["get", "post", "put", "delete"];
-
+  // console.log(acceptedMethods.indexOf(requestProperties.method));
   if (acceptedMethods.indexOf(requestProperties.method) > -1) {
     handler._users[requestProperties.method](requestProperties, callback);
   } else {
@@ -22,38 +24,67 @@ handler.userHandler = (requestProperties, callback) => {
 
 handler._users = {};
 
-//....POST method
 handler._users.post = (requestProperties, callback) => {
+  // First Name:
   const firstName =
     typeof requestProperties.body.firstName === "string" &&
     requestProperties.body.firstName.trim().length > 0
       ? requestProperties.body.firstName
       : false;
+  console.log(requestProperties.body.firstName);
+
+  // Last Name:
   const lastName =
     typeof requestProperties.body.lastName === "string" &&
     requestProperties.body.lastName.trim().length > 0
       ? requestProperties.body.lastName
       : false;
-  const phone =
+  console.log(requestProperties.body.lastName);
+
+  // Phone number:
+  let phone =
     typeof requestProperties.body.phone === "string" &&
     requestProperties.body.phone.trim().length === 11
       ? requestProperties.body.phone
-      : false;
+      : true;
+  console.log(requestProperties.body.phone);
 
+  // User password:
   const password =
     typeof requestProperties.body.password === "string" &&
     requestProperties.body.password.trim().length > 0
       ? requestProperties.body.password
       : false;
+  console.log(requestProperties.body.password);
+
+  // User tosAgreement
   const tosAgreement =
     typeof requestProperties.body.tosAgreement === "boolean" &&
     requestProperties.body.tosAgreement
       ? requestProperties.body.tosAgreement
       : false;
+  // console.log(requestProperties.body.tosAgreement);
+
+  // temporary
+  // if (firstName && lastName && phone && password && tosAgreement) {
+  // } else {
+  //   console.log(
+  //     firstName +
+  //       " " +
+  //       lastName +
+  //       " " +
+  //       phone +
+  //       " " +
+  //       password +
+  //       " " +
+  //       tosAgreement
+  //   );
+  // }
 
   if (firstName && lastName && phone && password && tosAgreement) {
     // make sure that the user doesn't already exists
-    ata.read("users", phone, (err1) => {
+    console.log("I am here...");
+    data.read("users", phone, (err1) => {
       if (err1) {
         const userObject = {
           firstName,
@@ -62,6 +93,16 @@ handler._users.post = (requestProperties, callback) => {
           password: hash(password),
           tosAgreement,
         };
+        // store the user to db
+        // data.create(
+        //   "test",
+        //   "newFile",
+        //   { name: "Bangladesh", language: "Bengali" },
+        //   (err) => {
+        //     console.log("error was", err);
+        //   }
+        // );
+
         data.create("users", phone, userObject, (err2) => {
           if (!err2) {
             callback(200, {
@@ -83,12 +124,5 @@ handler._users.post = (requestProperties, callback) => {
     });
   }
 };
-
-//....GET method
-handler._users.get = (requestProperties, callback) => {
-  callback(200);
-};
-handler._users.put = (requestProperties, callback) => {};
-handler._users.delete = (requestProperties, callback) => {};
 
 module.exports = handler;

@@ -38,8 +38,8 @@ app.createServer = () => {
   });
 };
 
-//------response/request handlers --------------------------------
+//-------------response/request handlers --------------------------------
 app.handleReqRes = handleReqRes;
 
-//----handle request response--------------------------------
+//--------------handle request response-------------------------------
 app.createServer();

@@ -1,0 +1,5 @@
+// firstName,
+//           lastName,
+//           phone,
+//           password: hash(password),
+//           tosAgreement,

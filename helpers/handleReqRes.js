@@ -6,16 +6,16 @@
  */
 
 //---dependencies--------------------------------
+// dependencies
 const url = require("url");
 const { StringDecoder } = require("string_decoder");
 const routes = require("../routes");
 const {
   notFoundHandler,
 } = require("../handlers/routeHandlers/notFoundHandler");
-const { type } = require("os");
 const { parseJSON } = require("./utilities");
 
-// module scaffolding
+// modue scaffolding
 const handler = {};
 
 handler.handleReqRes = (req, res) => {
@@ -40,21 +40,27 @@ handler.handleReqRes = (req, res) => {
   const decoder = new StringDecoder("utf-8");
   let realData = "";
 
-  //console.log("Trimmed path: " + trimmedPath);
   const chosenHandler = routes[trimmedPath]
     ? routes[trimmedPath]
     : notFoundHandler;
-  //   console.log("Hello type: " + typeof chosenHandler);
 
   req.on("data", (buffer) => {
+    console.log("received data");
     realData += decoder.write(buffer);
   });
 
   req.on("end", () => {
+    console.log("Requested ended");
     realData += decoder.end();
-
+    // console.log("Requested data: " + realData);
     requestProperties.body = parseJSON(realData);
-    console.log(typeof requestProperties.body);
+    // console.log("Requested firstName: ", requestProperties.body.firstName);
+    // try {
+    //   requestProperties.body = parseJSON(realData);
+    // } catch (error) {
+    //   console.log("Error parsing JSON:", error);
+    //   requestProperties.body = {}; // Default to an empty object in case of an error
+    // }
 
     chosenHandler(requestProperties, (statusCode, payload) => {
       statusCode = typeof statusCode === "number" ? statusCode : 500;
@@ -63,13 +69,10 @@ handler.handleReqRes = (req, res) => {
       const payloadString = JSON.stringify(payload);
 
       // return the final response
-      res.setHeader("content-type", "application/json");
+      res.setHeader("Content-Type", "application/json");
       res.writeHead(statusCode);
       res.end(payloadString);
     });
-
-    // response handle
-    // res.end("Hello world");
   });
 };
 
