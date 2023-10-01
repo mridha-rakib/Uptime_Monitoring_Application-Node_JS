@@ -13,6 +13,7 @@ const {
   notFoundHandler,
 } = require("../handlers/routeHandlers/notFoundHandler");
 const { type } = require("os");
+const { parseJSON } = require("./utilities");
 
 // module scaffolding
 const handler = {};
@@ -52,6 +53,8 @@ handler.handleReqRes = (req, res) => {
   req.on("end", () => {
     realData += decoder.end();
 
+    requestProperties.body = parseJSON(realData);
+
     chosenHandler(requestProperties, (statusCode, payload) => {
       statusCode = typeof statusCode === "number" ? statusCode : 500;
       payload = typeof payload === "object" ? payload : {};
@@ -59,6 +62,7 @@ handler.handleReqRes = (req, res) => {
       const payloadString = JSON.stringify(payload);
 
       // return the final response
+      res.setHeader("content-type", "application/json");
       res.writeHead(statusCode);
       res.end(payloadString);
     });

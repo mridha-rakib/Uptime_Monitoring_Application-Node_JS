@@ -25,9 +25,9 @@ const app = {};
 //   }
 // );
 
-data.read("test", "newFile", (err, result) => {
-  console.log(err, result);
-});
+// data.read("test", "newFile", (err, result) => {
+//   console.log(err, result);
+// });
 
 //----Create server----------------
 
