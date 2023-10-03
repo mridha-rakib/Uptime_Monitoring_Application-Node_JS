@@ -46,47 +46,63 @@ handler._token.post = (requestProperties, callback) => {
     requestProperties.body.password.trim().length > 0
       ? requestProperties.body.password
       : false;
-
-  // lib.read = (dir, file, callback) => {
-  //   fs.readFile(`${lib.basedir + dir}/${file}.json`, "utf8", (err, data) => {
-  //     callback(err, data);
-  //   });
-  // };
   if (phone && password) {
     data.read("users", phone, (err1, userData) => {
-      const hashedPassword = has(password);
+      const hashedPassword = hash(password);
       if (hashedPassword === parseJSON(userData).password) {
-        console.log(
-          "hash pass: " + hashedPassword,
-          +"u pss: " + parseJSON(userData).password
-        );
-
-        const tokenID = createRandomString(20);
+        const tokenId = createRandomString(20);
         const expires = Date.now() + 60 * 60 * 1000;
         const tokenObject = {
           phone,
-          id: tokenID,
+          id: tokenId,
           expires,
         };
 
-        data.crate("tokens", tokenID, tokenObject, (err2) => {
+        // store the token
+        data.create("tokens", tokenId, tokenObject, (err2) => {
           if (!err2) {
             callback(200, tokenObject);
           } else {
             callback(500, {
-              error: "There was a problem in the server side",
+              error: "There was a problem in the server side!",
             });
           }
         });
       } else {
         callback(400, {
-          error: "password is not valid.",
+          error: "Password is not valid!",
         });
       }
     });
   } else {
     callback(400, {
-      error: "You have a problem in your request.",
+      error: "You have a problem in your request",
+    });
+  }
+};
+
+handler._token.get = (requestProperties, callback) => {
+  const id =
+    typeof requestProperties.queryStringObject.id === "string" &&
+    requestProperties.queryStringObject.id.trim().length === 20
+      ? requestProperties.queryStringObject.id
+      : false;
+
+  if (id) {
+    // lookup the token
+    data.read("tokens", id, (err, tokenData) => {
+      const token = { ...parseJSON(tokenData) };
+      if (!err && token) {
+        callback(200, token);
+      } else {
+        callback(404, {
+          error: "Requested token was not found!",
+        });
+      }
+    });
+  } else {
+    callback(404, {
+      error: "Requested token was not found",
     });
   }
 };
