@@ -107,4 +107,17 @@ handler._token.get = (requestProperties, callback) => {
   }
 };
 
+handler._token.put = (requestProperties, callback) => {
+  const id =
+    typeof requestProperties.body.id === "string" &&
+    requestProperties.body.id.trim().length === 20
+      ? requestProperties.body.id
+      : false;
+
+  const extend = !!(
+    typeof requestProperties.body.extend === "boolean" &&
+    requestProperties.body.extend === true
+  );
+};
+
 module.exports = handler;
