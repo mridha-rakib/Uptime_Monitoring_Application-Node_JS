@@ -114,10 +114,86 @@ handler._token.put = (requestProperties, callback) => {
       ? requestProperties.body.id
       : false;
 
-  const extend = !!(
+  const extend =
     typeof requestProperties.body.extend === "boolean" &&
     requestProperties.body.extend === true
-  );
+      ? true
+      : false;
+  console.log("ID: " + id + " extend: " + extend);
+
+  if (id && extend) {
+    data.read("tokens", id, (err1, tokenData) => {
+      const tokenObject = parseJSON(tokenData);
+      if (tokenObject.expires > Date.now()) {
+        tokenObject.expires = Date.now() + 60 * 60 * 1000;
+        data.update("tokens", id, tokenObject, (err2) => {
+          if (!err2) {
+            callback(200);
+          } else {
+            callback(500, {
+              error: "There was a server side error!",
+            });
+          }
+        });
+      }
+    });
+  } else {
+    callback(400, {
+      error: "There was a problem in your request...",
+    });
+  }
 };
 
+handler._token.delete = (requestProperties, callback) => {
+  // check the token if valid
+  const id =
+    typeof requestProperties.queryStringObject.id === "string" &&
+    requestProperties.queryStringObject.id.trim().length === 20
+      ? requestProperties.queryStringObject.id
+      : false;
+
+  if (id) {
+    // lookup the user
+    data.read("tokens", id, (err1, tokenData) => {
+      if (!err1 && tokenData) {
+        data.delete("tokens", id, (err2) => {
+          if (!err2) {
+            callback(200, {
+              message: "Token was successfully deleted!",
+            });
+          } else {
+            callback(500, {
+              error: "There was a server side error!",
+            });
+          }
+        });
+      } else {
+        callback(500, {
+          error: "There was a server side error!",
+        });
+      }
+    });
+  } else {
+    callback(400, {
+      error: "There was a problem in your request!",
+    });
+  }
+};
+
+handler._token.verify = (id, phone, callback) => {
+  data.read("tokens", id, (err, tokenData) => {
+    if (!err && tokenData) {
+      if (
+        parseJSON(tokenData).phone === phone &&
+        parseJSON(tokenData).expires > Date.now()
+      ) {
+        callback(true);
+      } else {
+        callback(false);
+      }
+    } else {
+      callback(false);
+    }
+  });
+};
 module.exports = handler;
